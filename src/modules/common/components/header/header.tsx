@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export const Header = () => (
     <nav className="header navbar navbar-expand-md navbar-light bg-faded">
-        <div className="container">
+        <div className="container-fluid">
             <Link className="mr-auto navbar-brand" to="/manage">Dashboard App</Link>
             <button type="button" className="navbar-toggler">
                 <span className="navbar-toggler-icon"></span>

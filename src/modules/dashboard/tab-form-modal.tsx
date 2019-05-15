@@ -1,32 +1,32 @@
 import React, { useRef } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Formik, Form } from 'formik';
-import uniqid from 'uniqid';
 import { TextField } from '../common/components/form-elements/text-field/text-field';
-import { Tab } from './redux/dashboard-reducer';
+
+interface FormType  {
+  name: string
+}
 
 export interface TabFormModalProps {
   open: boolean;
   close: () => void;
-  currentValue: {
-    id?: string;
-    name: string;
-  };
-  onSubmit: (tab: Tab) => void;
-  type: 'ADD' | 'EDIT';
+  currentValue?: FormType;
+  onSubmit: (tab: FormType) => void;
+  title: string;
 }
 
 export const TabFormModal = ({
   open,
   close,
-  type,
+  currentValue,
+  title,
   onSubmit,
 }: TabFormModalProps) => {
   const formRef: React.MutableRefObject<null | any> = useRef(null);
   return (
     <Modal isOpen={open} toggle={close}>
       <ModalHeader toggle={close}>
-        {type === 'ADD' ? 'Add Tab' : 'Edit Tab'}
+        {title}
       </ModalHeader>
       <ModalBody>
         <Formik
@@ -35,7 +35,7 @@ export const TabFormModal = ({
             formRef.current = node as any;
           }}
           initialValues={{
-            name: '',
+            name: currentValue ? currentValue.name : '',
           }}
           validate={values => {
             let errors: { name?: string } = {};
@@ -46,7 +46,6 @@ export const TabFormModal = ({
           }}
           onSubmit={values => {
             const tab = {
-              id: uniqid(),
               name: values.name,
             };
             onSubmit(tab);

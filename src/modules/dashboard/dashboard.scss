@@ -1,3 +1,19 @@
 .dashboard-page {
-    
+    &--tab-header {
+        position: relative;
+    }
+
+    &--tab-actions {
+        position: absolute;
+        right: 0;
+        top: 5px;
+    }
+    .card-title {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+    }
+    .react-resizable .card-title {
+        cursor: move;
+    }    
 }
+

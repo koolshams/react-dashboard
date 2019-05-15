@@ -6,7 +6,7 @@ import { DashboardPage } from './modules/dashboard/dashboard-page';
 export const Manage = () => (
     <>
         <Header/>
-        <div className="content container">
+        <div className="content container-fluid">
             <Switch>
                 <Route path="/manage" exact={true} component={DashboardPage}/>
             </Switch>

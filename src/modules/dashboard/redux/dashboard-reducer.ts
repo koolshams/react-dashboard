@@ -6,9 +6,14 @@ export interface Tab {
   name: string;
 }
 
+export enum WidgetTypes {
+  PERFORMANCE = 'PERFORMANCE'
+}
+
 export interface Widget {
   id: string;
   tabId: string;
+  type: WidgetTypes,
   title: string;
   position: {
     x: number;
@@ -51,7 +56,7 @@ export function dashboard(state = initialState, action: DasboardAction) {
         ...state,
         tabs: [
           ...state.tabs.slice(0, deleteIndex),
-          ...state.tabs.slice(deleteIndex),
+          ...state.tabs.slice(deleteIndex+1),
         ],
       };
 
@@ -64,7 +69,7 @@ export function dashboard(state = initialState, action: DasboardAction) {
         tabs: [
           ...state.tabs.slice(0, editIndex),
           action.payload,
-          ...state.tabs.slice(editIndex),
+          ...state.tabs.slice(editIndex+1),
         ],
       };
 
