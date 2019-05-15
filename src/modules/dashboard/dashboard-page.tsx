@@ -118,7 +118,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       x: 0,
                       y: 0,
                       w: 5,
-                      h: 5,
+                      h: 5
                     },
                     props: {},
                   },
@@ -137,9 +137,9 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Col sm="12">
                 {activeTab === tab.id && (
                   <GridLayout
+                    containerPadding={[15, 15]}
                     draggableHandle=".card-title"
-                    layout={layout}
-                    onLayoutChange={(updatedLayout:any) => setLayout(updatedLayout)}
+                    cols={24} rowHeight={30} width={window.innerWidth - 50}
                     isResizable={resizable}
                     isDraggable={resizable}
                   >

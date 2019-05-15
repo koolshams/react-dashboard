@@ -8,6 +8,10 @@ interface PerformanceWidgetProps {
 }
 
 const options = {
+  chart: {
+    width: 400,
+    height: 200
+  },
   title: {
     text: 'My chart',
   },
