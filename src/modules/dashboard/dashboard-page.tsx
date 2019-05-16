@@ -29,7 +29,7 @@ import GridLayout from 'react-grid-layout';
 
 import 'react-resizable/css/styles.css';
 import './dashboard.scss';
-import { constructWidget } from './widgets/widget-base';
+import { constructWidget, widgets } from './widgets/widget-base';
 
 interface StateProps {
   tabs: Tab[];
@@ -52,20 +52,22 @@ function addWidgetHelper(
   tabId: string,
   addWidget: (widget: Widget) => void,
 ) {
-  const widget: Widget = {
-    tabId,
-    id: uniqid(),
-    title: 'Hello',
-    type: type,
-    position: {
-      x: 0,
-      y: 0,
-      w: 8,
-      h: 8,
-    },
-    props: {},
-  };
-  addWidget(widget);
+  const wd = widgets.find(w => w.type === type);
+  if (wd) {
+    const widget: Widget = {
+      tabId,
+      id: uniqid(),
+      type: type,
+      position: {
+        x: 0,
+        y: 0,
+        w: 8,
+        h: 8,
+      },
+      props: wd.props,
+    };
+    addWidget(widget);
+  }
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -74,7 +76,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   onAddTab,
   onEditTab,
   onDeleteTab,
-  onAddWidget
+  onAddWidget,
+  onEditWidget,
+  onDeleteWidget,
 }) => {
   const [activeTab, setActiveTab] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -168,7 +172,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                     isResizable={resizable}
                     isDraggable={resizable}
                   >
-                    {currentWidgets.map(widget => constructWidget(widget))}
+                    {currentWidgets.map(widget =>
+                      constructWidget(widget, onEditWidget, onDeleteWidget),
+                    )}
                   </GridLayout>
                 )}
               </Col>

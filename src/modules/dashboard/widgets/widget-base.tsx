@@ -1,27 +1,121 @@
-import React from 'react';
-import { Widget, WidgetTypes } from '../redux/dashboard-reducer';
+import React, { useState } from 'react';
+import { Widget } from '../redux/dashboard-reducer';
 import { Button } from 'reactstrap';
-import { PerformanceWidget } from './performance-widget';
+import perfWidget from './performance';
+import { Formik, Form } from 'formik';
+import { TextField } from '../../common/components/form-elements/text-field/text-field';
+import { WidgetMap } from './interfaces';
 
-export function constructWidget(widget: Widget) {
+export const widgets: WidgetMap[] = [perfWidget];
+
+const MAIN_VIEW = 'main';
+const FORM_VIEW = 'form';
+
+type WidgetFn = (widget: Widget) => void;
+type WidgetIdFn = (widgetId: string) => void;
+
+function renderWidget(widget: Widget) {
+  const target = widgets.find(w => w.type === widget.type);
+  return target ? <target.main widget={widget} /> : null;
+}
+
+function renderWidgetForm(widget: Widget, touched: any, errors: any) {
+  const target = widgets.find(w => w.type === widget.type);
+  return target ? <target.form touched={touched} errors={errors} /> : null;
+}
+
+interface WidgetBaseProps {
+  widget: Widget;
+  onUpdate: WidgetFn;
+  onDelete: WidgetIdFn;
+}
+
+const WidgetBase: React.FC<WidgetBaseProps> = ({
+  widget,
+  onUpdate,
+  onDelete,
+}) => {
+  const [view, setView] = useState(MAIN_VIEW);
   return (
-    <div className="card" key={widget.id} data-grid={widget.position}>
+    <>
       <h5 className="card-title">
-        {widget.title}{' '}
-        <Button
-          color="light"
-          size="xs"
-          className="float-right"
-          onMouseDown={evt => evt.stopPropagation()}
-        >
-          <i className="fas fa-cog" />
-        </Button>
+        {widget.props.title}{' '}
+        {view === MAIN_VIEW && (
+          <Button
+            color="light"
+            size="xs"
+            className="float-right"
+            onMouseDown={evt => {
+              evt.stopPropagation();
+              setView(FORM_VIEW);
+            }}
+          >
+            <i className="fas fa-cog" />
+          </Button>
+        )}
       </h5>
       <div className="card-body">
-        {widget.type === WidgetTypes.PERFORMANCE && (
-          <PerformanceWidget title={widget.title} props={widget.props} />
+        {view === MAIN_VIEW ? renderWidget(widget) : null}
+        {view === FORM_VIEW && (
+          <div>
+            <Formik
+              isInitialValid={false}
+              initialValues={widget.props}
+              onSubmit={values => {
+                const updatedWidget = {
+                  ...widget,
+                  props: values,
+                };
+                onUpdate(updatedWidget);
+                setView(MAIN_VIEW);
+              }}
+            >
+              {({ errors, touched }) => (
+                <Form>
+                  <TextField
+                    name="title"
+                    type="title"
+                    placeholder="Title"
+                    title="Title"
+                    error={errors.title}
+                    touched={touched.title}
+                  />
+                  {renderWidgetForm(widget, touched, errors)}
+                  <button type="submit" className="btn btn-primary mb-2">
+                    Save
+                  </button>{' '}
+                  <button
+                    type="button"
+                    className="btn btn-light mb-2"
+                    onClick={() => setView(MAIN_VIEW)}
+                  >
+                    Cancel
+                  </button>{' '}
+                  <button
+                    type="button"
+                    className="btn btn-danger mb-2"
+                    onClick={() => onDelete(widget.id)}
+                  >
+                    Delete
+                  </button>
+                </Form>
+              )}
+            </Formik>
+          </div>
         )}
       </div>
+    </>
+  );
+};
+
+export function constructWidget(
+  widget: Widget,
+  onUpdate: WidgetFn,
+  onDelete: WidgetIdFn,
+) {
+  return (
+    <div className="card" key={widget.id} data-grid={widget.position}>
+      <WidgetBase widget={widget} onUpdate={onUpdate} onDelete={onDelete} />
     </div>
   );
 }

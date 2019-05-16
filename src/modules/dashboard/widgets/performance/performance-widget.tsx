@@ -1,16 +1,12 @@
 import React from 'react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-
-interface PerformanceWidgetProps {
-  title: string;
-  props: any;
-}
+import { WidgetProps } from '../interfaces';
 
 const options = {
   chart: {
     width: 400,
-    height: 200
+    height: 200,
   },
   title: {
     text: 'My chart',
@@ -22,12 +18,10 @@ const options = {
   ],
   credits: {
     enabled: false,
-  }
+  },
 };
 
-export const PerformanceWidget: React.FC<PerformanceWidgetProps> = ({
-  title,
-}) => {
+export const PerformanceWidget: React.FC<WidgetProps> = () => {
   return (
     <div>
       <HighchartsReact highcharts={Highcharts} options={options as any} />

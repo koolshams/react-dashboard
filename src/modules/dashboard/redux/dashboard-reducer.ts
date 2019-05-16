@@ -18,14 +18,16 @@ export interface Widget {
   id: string;
   tabId: string;
   type: WidgetTypes;
-  title: string;
   position: {
     x: number;
     y: number;
     w: number;
     h: number;
   };
-  props: any;
+  props: {
+    title: string;
+    [key: string]: string | number | boolean;
+  };
 }
 
 export interface DashboardState {
