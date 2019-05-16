@@ -5,7 +5,7 @@ import {
   DropdownMenu,
   DropdownItem,
 } from 'reactstrap';
-import { Tab } from '../redux/dashboard-reducer';
+import { Tab } from '../../redux/dashboard-reducer';
 
 import './tab-menu.scss';
 

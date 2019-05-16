@@ -15,15 +15,21 @@ import { TabFormModal } from './tab-form-modal';
 import { Tab, Widget, WidgetTypes } from './redux/dashboard-reducer';
 import { connect } from 'react-redux';
 import { StoreState } from '../../redux-config';
-import { addTab, removeTab, editTab } from './redux/dashboard-actions';
-import { TabMenu } from './components/tab-menu';
+import {
+  addTab,
+  removeTab,
+  editTab,
+  addWidget,
+  editWidget,
+  removeWidget,
+} from './redux/dashboard-actions';
+import { TabMenu } from './components/tab-menu/tab-menu';
 import { ConfirmModal } from '../common/components/confirm-modal/confirm-modal';
 import GridLayout from 'react-grid-layout';
 
 import 'react-resizable/css/styles.css';
 import './dashboard.scss';
-import { PerformanceWidget } from './widgets/performance-widget';
-
+import { constructWidget } from './widgets/widget-base';
 
 interface StateProps {
   tabs: Tab[];
@@ -31,19 +37,44 @@ interface StateProps {
 }
 
 interface DispatchProps {
-  onAdd: (tab: Tab) => void;
-  onEdit: (tab: Tab) => void;
-  onDelete: (tabId: string) => void;
+  onAddTab: (tab: Tab) => void;
+  onEditTab: (tab: Tab) => void;
+  onDeleteTab: (tabId: string) => void;
+  onAddWidget: (widget: Widget) => void;
+  onEditWidget: (widget: Widget) => void;
+  onDeleteWidget: (widgetId: string) => void;
 }
 
 interface DashboardProps extends StateProps, DispatchProps {}
 
+function addWidgetHelper(
+  type: WidgetTypes,
+  tabId: string,
+  addWidget: (widget: Widget) => void,
+) {
+  const widget: Widget = {
+    tabId,
+    id: uniqid(),
+    title: 'Hello',
+    type: type,
+    position: {
+      x: 0,
+      y: 0,
+      w: 8,
+      h: 8,
+    },
+    props: {},
+  };
+  addWidget(widget);
+}
+
 const Dashboard: React.FC<DashboardProps> = ({
   tabs,
   widgets,
-  onAdd,
-  onDelete,
-  onEdit,
+  onAddTab,
+  onEditTab,
+  onDeleteTab,
+  onAddWidget
 }) => {
   const [activeTab, setActiveTab] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -51,13 +82,16 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [tabToEdit, setTabToEdit] = useState<null | Tab>(null);
   const [currentWidgets, setCurrentWidgets] = useState<Widget[]>([]);
   const [resizable, setResizable] = useState(false);
-  const [layout, setLayout] = useState<any[]>([]);
 
   useEffect(() => {
     if (!tabs.find(tab => tab.id === activeTab) && tabs.length > 0) {
       setActiveTab(tabs[0].id);
     }
   }, [tabs, activeTab]);
+
+  useEffect(() => {
+    setCurrentWidgets(widgets.filter(w => w.tabId === activeTab));
+  }, [widgets, activeTab]);
 
   return (
     <div className="dashboard-page">
@@ -107,22 +141,11 @@ const Dashboard: React.FC<DashboardProps> = ({
             <Button
               size="sm"
               onClick={() => {
-                setCurrentWidgets([
-                  ...currentWidgets,
-                  {
-                    id: uniqid(),
-                    title: 'Hello',
-                    type: WidgetTypes.PERFORMANCE,
-                    tabId: activeTab,
-                    position: {
-                      x: 0,
-                      y: 0,
-                      w: 5,
-                      h: 5
-                    },
-                    props: {},
-                  },
-                ]);
+                addWidgetHelper(
+                  WidgetTypes.PERFORMANCE,
+                  activeTab,
+                  onAddWidget,
+                );
               }}
             >
               Add Widget
@@ -139,34 +162,13 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <GridLayout
                     containerPadding={[15, 15]}
                     draggableHandle=".card-title"
-                    cols={24} rowHeight={30} width={window.innerWidth - 50}
+                    cols={24}
+                    rowHeight={30}
+                    width={window.innerWidth - 50}
                     isResizable={resizable}
                     isDraggable={resizable}
                   >
-                    {currentWidgets.map(widget => (
-                      <div className="card" key={widget.id} data-grid={widget.position}>
-                        <h5 className="card-title">
-                          {widget.title}{' '}
-                          <Button
-                            color="light"
-                            size="xs"
-                            className="float-right"
-                            onMouseDown={evt => evt.stopPropagation()}
-                          >
-                            <i className="fas fa-cog" />
-                          </Button>
-                        </h5>
-                        <div className="card-body">
-                          {widget.type === WidgetTypes.PERFORMANCE && (
-                            <PerformanceWidget
-                              title={widget.title}
-                              props={widget.props}
-                            />
-                          )}
-                          Widget {widget.id} {widget.title}
-                        </div>
-                      </div>
-                    ))}
+                    {currentWidgets.map(widget => constructWidget(widget))}
                   </GridLayout>
                 )}
               </Col>
@@ -177,7 +179,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       <TabFormModal
         title="Add Tab"
         onSubmit={values => {
-          onAdd({
+          onAddTab({
             ...values,
             id: uniqid(),
           });
@@ -189,7 +191,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       {tabToDelete && (
         <ConfirmModal
           onYes={() => {
-            onDelete(tabToDelete.id);
+            onDeleteTab(tabToDelete.id);
             setTabToDelete(null);
           }}
           onClose={() => {
@@ -204,7 +206,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         <TabFormModal
           title={'Edit Tab'}
           onSubmit={values => {
-            onEdit({
+            onEditTab({
               id: tabToEdit.id,
               ...values,
             });
@@ -225,8 +227,11 @@ export const DashboardPage = connect<StateProps, DispatchProps, {}, StoreState>(
     widgets: state.dashboard.widgets,
   }),
   {
-    onAdd: addTab,
-    onDelete: removeTab,
-    onEdit: editTab,
+    onAddTab: addTab,
+    onDeleteTab: removeTab,
+    onEditTab: editTab,
+    onAddWidget: addWidget,
+    onEditWidget: editWidget,
+    onDeleteWidget: removeWidget,
   },
 )(Dashboard);

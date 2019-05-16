@@ -1,8 +1,11 @@
-import { Tab } from './dashboard-reducer';
+import { Tab, Widget } from './dashboard-reducer';
 import {
   DASHBOARD_TAB_ADD,
   DASHBOARD_TAB_DELETE,
   DASHBOARD_TAB_EDIT,
+  DASHBOARD_WIDGET_ADD,
+  DASHBOARD_WIDGET_DELETE,
+  DASHBOARD_WIDGET_EDIT,
 } from './dashboard-constants';
 
 export const addTab = (tab: Tab) => ({
@@ -18,4 +21,19 @@ export const removeTab = (tabId: string) => ({
 export const editTab = (tab: Tab) => ({
   type: DASHBOARD_TAB_EDIT,
   payload: tab,
+});
+
+export const addWidget = (widget: Widget) => ({
+  type: DASHBOARD_WIDGET_ADD,
+  payload: widget,
+});
+
+export const removeWidget = (widgetId: string) => ({
+  type: DASHBOARD_WIDGET_DELETE,
+  payload: widgetId,
+});
+
+export const editWidget= (widget: Widget) => ({
+  type: DASHBOARD_WIDGET_EDIT,
+  payload: widget,
 });

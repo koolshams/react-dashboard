@@ -1,5 +1,9 @@
 import { Action } from 'redux';
 import * as constants from './dashboard-constants';
+import {
+  removeElement,
+  updateElement,
+} from '../../common/redux/reducer-helper';
 
 export interface Tab {
   id: string;
@@ -7,13 +11,13 @@ export interface Tab {
 }
 
 export enum WidgetTypes {
-  PERFORMANCE = 'PERFORMANCE'
+  PERFORMANCE = 'PERFORMANCE',
 }
 
 export interface Widget {
   id: string;
   tabId: string;
-  type: WidgetTypes,
+  type: WidgetTypes;
   title: string;
   position: {
     x: number;
@@ -38,7 +42,10 @@ const initialState: DashboardState = {
   widgets: [],
 };
 
-export function dashboard(state = initialState, action: DasboardAction) {
+export function dashboard(
+  state = initialState,
+  action: DasboardAction,
+): DashboardState {
   switch (action.type) {
     case constants.DASHBOARD_TAB_ADD:
       return {
@@ -46,32 +53,42 @@ export function dashboard(state = initialState, action: DasboardAction) {
         tabs: [...state.tabs, action.payload],
       };
     case constants.DASHBOARD_TAB_DELETE:
-      const deleteIndex = state.tabs.findIndex(
-        tab => tab.id === action.payload,
+      return removeElement<DashboardState>(
+        state,
+        state.tabs,
+        action.payload,
+        'tabs',
       );
-      if (deleteIndex === -1) {
-        return state;
-      }
-      return {
-        ...state,
-        tabs: [
-          ...state.tabs.slice(0, deleteIndex),
-          ...state.tabs.slice(deleteIndex+1),
-        ],
-      };
 
     case constants.DASHBOARD_TAB_EDIT:
-      const editIndex = state.tabs.findIndex(
-        tab => tab.id === action.payload.id,
+      return updateElement<DashboardState>(
+        state,
+        state.tabs,
+        action.payload as Tab,
+        'tabs',
       );
+
+    case constants.DASHBOARD_WIDGET_ADD:
       return {
         ...state,
-        tabs: [
-          ...state.tabs.slice(0, editIndex),
-          action.payload,
-          ...state.tabs.slice(editIndex+1),
-        ],
+        widgets: [...state.widgets, action.payload],
       };
+
+    case constants.DASHBOARD_WIDGET_DELETE:
+      return removeElement<DashboardState>(
+        state,
+        state.widgets,
+        action.payload,
+        'widgets',
+      );
+
+    case constants.DASHBOARD_WIDGET_EDIT:
+      return updateElement<DashboardState>(
+        state,
+        state.widgets,
+        action.payload,
+        'widgets',
+      );
 
     default:
       return state;

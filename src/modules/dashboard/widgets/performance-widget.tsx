@@ -20,6 +20,9 @@ const options = {
       data: [1, 2, 3],
     },
   ],
+  credits: {
+    enabled: false,
+  }
 };
 
 export const PerformanceWidget: React.FC<PerformanceWidgetProps> = ({
