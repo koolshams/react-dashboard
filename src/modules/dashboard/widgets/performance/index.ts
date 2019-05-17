@@ -1,6 +1,6 @@
 import { PerformanceWidgetForm } from "./performance-widget-form";
 import { PerformanceWidget } from "./performance-widget";
-import { WidgetTypes } from "../../redux/dashboard-reducer";
+import { WidgetTypes } from "../../interfaces";
 
 export default {
     type: WidgetTypes.PERFORMANCE,

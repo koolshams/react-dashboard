@@ -12,7 +12,6 @@ import {
   Button,
 } from 'reactstrap';
 import { TabFormModal } from './tab-form-modal';
-import { Tab, Widget, WidgetTypes } from './redux/dashboard-reducer';
 import { connect } from 'react-redux';
 import { StoreState } from '../../redux-config';
 import {
@@ -23,13 +22,15 @@ import {
   editWidget,
   removeWidget,
 } from './redux/dashboard-actions';
-import { TabMenu } from './components/tab-menu/tab-menu';
 import { ConfirmModal } from '../common/components/confirm-modal/confirm-modal';
 import GridLayout from 'react-grid-layout';
 
 import 'react-resizable/css/styles.css';
 import './dashboard.scss';
 import { constructWidget, widgets } from './widgets/widget-base';
+import { WidgetTypes, Widget, Tab } from './interfaces';
+import { EditDeleteMenu } from '../common/components/edit-delete-menu/edit-delete-menu';
+import { WidgetModal } from './widget-modal';
 
 interface StateProps {
   tabs: Tab[];
@@ -86,6 +87,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [tabToEdit, setTabToEdit] = useState<null | Tab>(null);
   const [currentWidgets, setCurrentWidgets] = useState<Widget[]>([]);
   const [resizable, setResizable] = useState(false);
+  const [widgetModalVisibile, setWidgetModalVisible] = useState(false);
 
   useEffect(() => {
     if (!tabs.find(tab => tab.id === activeTab) && tabs.length > 0) {
@@ -109,12 +111,11 @@ const Dashboard: React.FC<DashboardProps> = ({
               }}
             >
               {tab.name}{' '}
-              <TabMenu
-                tab={tab}
-                onDelete={tab => {
+              <EditDeleteMenu
+                onDelete={() => {
                   setTabToDelete(tab);
                 }}
-                onEdit={tab => {
+                onEdit={() => {
                   setTabToEdit(tab);
                 }}
               />
@@ -142,16 +143,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             >
               <i className="fas fa-expand-arrows-alt" />
             </Button>{' '}
-            <Button
-              size="sm"
-              onClick={() => {
-                addWidgetHelper(
-                  WidgetTypes.PERFORMANCE,
-                  activeTab,
-                  onAddWidget,
-                );
-              }}
-            >
+            <Button size="sm" onClick={() => setWidgetModalVisible(true)}>
               Add Widget
             </Button>
           </NavItem>
@@ -223,6 +215,14 @@ const Dashboard: React.FC<DashboardProps> = ({
           close={() => setTabToEdit(null)}
         />
       )}
+      <WidgetModal
+        close={() => setWidgetModalVisible(false)}
+        open={widgetModalVisibile}
+        onSubmit={type => {
+          addWidgetHelper(type, activeTab, onAddWidget);
+          setWidgetModalVisible(false);
+        }}
+      />
     </div>
   );
 };

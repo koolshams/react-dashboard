@@ -5,18 +5,15 @@ import {
   DropdownMenu,
   DropdownItem,
 } from 'reactstrap';
-import { Tab } from '../../redux/dashboard-reducer';
 
-import './tab-menu.scss';
+import './edit-delete-menu.scss';
 
-export interface TabMenuProps {
-  onDelete: (tab: Tab) => void;
-  onEdit: (tab: Tab) => void;
-  tab: Tab;
+interface MenuProps {
+  onDelete: () => void;
+  onEdit: () => void;
 }
 
-export const TabMenu: React.FC<TabMenuProps> = ({
-  tab,
+export const EditDeleteMenu: React.FC<MenuProps> = ({
   onEdit,
   onDelete,
 }) => {
@@ -30,7 +27,7 @@ export const TabMenu: React.FC<TabMenuProps> = ({
       <DropdownMenu>
         <DropdownItem
           onClick={() => {
-            onEdit(tab);
+            onEdit();
             setMenuVisible(false);
           }}
         >
@@ -38,7 +35,7 @@ export const TabMenu: React.FC<TabMenuProps> = ({
         </DropdownItem>
         <DropdownItem
           onClick={() => {
-            onDelete(tab);
+            onDelete();
             setMenuVisible(false);
           }}
         >

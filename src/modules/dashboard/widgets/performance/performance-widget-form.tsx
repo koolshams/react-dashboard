@@ -1,5 +1,5 @@
 import React from 'react';
-import { WidgetFormProps } from '../interfaces';
+import { WidgetFormProps } from '../../interfaces';
 
 export const PerformanceWidgetForm: React.FC<WidgetFormProps> = ({
   errors,

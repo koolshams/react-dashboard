@@ -4,31 +4,7 @@ import {
   removeElement,
   updateElement,
 } from '../../common/redux/reducer-helper';
-
-export interface Tab {
-  id: string;
-  name: string;
-}
-
-export enum WidgetTypes {
-  PERFORMANCE = 'PERFORMANCE',
-}
-
-export interface Widget {
-  id: string;
-  tabId: string;
-  type: WidgetTypes;
-  position: {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
-  props: {
-    title: string;
-    [key: string]: string | number | boolean;
-  };
-}
+import { Tab, Widget } from '../interfaces';
 
 export interface DashboardState {
   tabs: Tab[];

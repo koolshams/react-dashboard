@@ -1,12 +1,12 @@
+import { Form, Formik } from 'formik';
 import React, { useState } from 'react';
-import { Widget } from '../redux/dashboard-reducer';
 import { Button } from 'reactstrap';
-import perfWidget from './performance';
-import { Formik, Form } from 'formik';
 import { TextField } from '../../common/components/form-elements/text-field/text-field';
-import { WidgetMap } from './interfaces';
+import { Widget, WidgetMap } from '../interfaces';
+import perfWidget from './performance';
+import staticWidget from './static';
 
-export const widgets: WidgetMap[] = [perfWidget];
+export const widgets: WidgetMap[] = [perfWidget, staticWidget];
 
 const MAIN_VIEW = 'main';
 const FORM_VIEW = 'form';
