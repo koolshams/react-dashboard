@@ -4,15 +4,18 @@ import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
 import { dashboard, DashboardState } from './modules/dashboard/redux/dashboard-reducer';
+import { PageState, page } from './modules/page/redux/page-reducers';
 
 export interface StoreState {
   router: RouterState,
   dashboard: DashboardState
+  page: PageState
 }
 
 function storeReducer(historyObject: History<any>) {
   return combineReducers({
     dashboard,
+    page,
     router: connectRouter(historyObject),
   });
 }
