@@ -1,3 +1,4 @@
+import { Tab, Widget } from '../interfaces';
 import {
   DASHBOARD_TAB_ADD,
   DASHBOARD_TAB_DELETE,
@@ -6,7 +7,6 @@ import {
   DASHBOARD_WIDGET_DELETE,
   DASHBOARD_WIDGET_EDIT,
 } from './dashboard-constants';
-import { Tab, Widget } from '../interfaces';
 
 export const addTab = (tab: Tab) => ({
   type: DASHBOARD_TAB_ADD,

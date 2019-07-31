@@ -1,37 +1,30 @@
-import { connectRouter, routerMiddleware, RouterState } from 'connected-react-router';
-import { createBrowserHistory, History } from 'history';
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import thunk from 'redux-thunk';
-import { dashboard, DashboardState } from './modules/dashboard/redux/dashboard-reducer';
-import { PageState, page } from './modules/page/redux/page-reducers';
+import {
+  dashboard,
+  DashboardState,
+} from './modules/dashboard/redux/dashboard-reducer';
 
 export interface StoreState {
-  router: RouterState,
-  dashboard: DashboardState
-  page: PageState
+  dashboard: DashboardState;
 }
 
-function storeReducer(historyObject: History<any>) {
+function storeReducer() {
   return combineReducers({
     dashboard,
-    page,
-    router: connectRouter(historyObject),
   });
 }
 
-const logger = createLogger({});
-
-export const history = createBrowserHistory();
-
-export function configureStore(preloadedState: any, historyObject: History<any>) {
+export function configureStore(
+  preloadedState: any,
+) {
   const store = createStore(
-    storeReducer(historyObject),
+    storeReducer(),
     preloadedState,
     compose(
-      applyMiddleware(routerMiddleware(history)),
       applyMiddleware(thunk),
-      applyMiddleware(logger),
+      applyMiddleware(createLogger({})),
     ),
   );
 

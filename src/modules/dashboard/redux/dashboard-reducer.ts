@@ -1,10 +1,10 @@
 import { Action } from 'redux';
-import * as constants from './dashboard-constants';
 import {
   removeElement,
   updateElement,
 } from '../../common/redux/reducer-helper';
 import { Tab, Widget } from '../interfaces';
+import * as constants from './dashboard-constants';
 
 export interface DashboardState {
   tabs: Tab[];
