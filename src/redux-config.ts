@@ -1,32 +1,18 @@
-import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
-import { createLogger } from 'redux-logger';
-import thunk from 'redux-thunk';
-import {
-  dashboard,
-  DashboardState,
-} from './modules/dashboard/redux/dashboard-reducer';
+import { configureStore } from '@reduxjs/toolkit';
+import { dashboardSlice } from './modules/dashboard/store/dashboard-slice';
+import { DashboardState } from './modules/dashboard/store/dashboard-slice.types';
 
-export interface StoreState {
-  dashboard: DashboardState;
+export interface AppState {
+  dashboard: DashboardState
 }
 
-function storeReducer() {
-  return combineReducers({
-    dashboard,
+export function configureAppStore() {
+  return configureStore<AppState>({
+    reducer: {
+      dashboard: dashboardSlice.reducer,
+    } as any,
+    preloadedState: {
+      dashboard: dashboardSlice.getInitialState(),
+    }
   });
-}
-
-export function configureStore(
-  preloadedState: any,
-) {
-  const store = createStore(
-    storeReducer(),
-    preloadedState,
-    compose(
-      applyMiddleware(thunk),
-      applyMiddleware(createLogger({})),
-    ),
-  );
-
-  return store;
 }

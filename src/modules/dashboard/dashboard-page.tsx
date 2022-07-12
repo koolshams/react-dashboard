@@ -12,16 +12,7 @@ import {
   Button,
 } from 'reactstrap';
 import { TabFormModal } from './tab-form-modal';
-import { connect } from 'react-redux';
-import { StoreState } from '../../redux-config';
-import {
-  addTab,
-  removeTab,
-  editTab,
-  addWidget,
-  editWidget,
-  removeWidget,
-} from './redux/dashboard-actions';
+import { useDispatch, useSelector } from 'react-redux';
 import { ConfirmModal } from '../common/components/confirm-modal/confirm-modal';
 import GridLayout from 'react-grid-layout';
 
@@ -31,29 +22,22 @@ import { constructWidget, widgets } from './widgets/widget-base';
 import { WidgetTypes, Widget, Tab } from './interfaces';
 import { EditDeleteMenu } from '../common/components/edit-delete-menu/edit-delete-menu';
 import { WidgetModal } from './widget-modal';
-
-interface StateProps {
-  tabs: Tab[];
-  widgets: Widget[];
-}
-
-interface DispatchProps {
-  onAddTab: (tab: Tab) => void;
-  onEditTab: (tab: Tab) => void;
-  onDeleteTab: (tabId: string) => void;
-  onAddWidget: (widget: Widget) => void;
-  onEditWidget: (widget: Widget) => void;
-  onDeleteWidget: (widgetId: string) => void;
-}
-
-interface DashboardProps extends StateProps, DispatchProps {}
+import { AppState } from '../../redux-config';
+import {
+  addTab,
+  addWidget,
+  deleteTab,
+  deleteWidget,
+  editTab,
+  editWidget,
+} from './store/dashboard-slice';
 
 function addWidgetHelper(
   type: WidgetTypes,
   tabId: string,
   addWidget: (widget: Widget) => void,
 ) {
-  const wd = widgets.find(w => w.type === type);
+  const wd = widgets.find((w) => w.type === type);
   if (wd) {
     const widget: Widget = {
       tabId,
@@ -71,16 +55,7 @@ function addWidgetHelper(
   }
 }
 
-const Dashboard: React.FC<DashboardProps> = ({
-  tabs,
-  widgets,
-  onAddTab,
-  onEditTab,
-  onDeleteTab,
-  onAddWidget,
-  onEditWidget,
-  onDeleteWidget,
-}) => {
+const DashboardPage = ({}) => {
   const [activeTab, setActiveTab] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [tabToDelete, setTabToDelete] = useState<null | Tab>(null);
@@ -89,20 +64,25 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [resizable, setResizable] = useState(false);
   const [widgetModalVisibile, setWidgetModalVisible] = useState(false);
 
+  const tabs = useSelector<AppState, Tab[]>((state) => state.dashboard.tabs);
+  const widgets = useSelector<AppState, Widget[]>(
+    (state) => state.dashboard.widgets,
+  );
+  const dispatch = useDispatch();
   useEffect(() => {
-    if (!tabs.find(tab => tab.id === activeTab) && tabs.length > 0) {
+    if (!tabs.find((tab) => tab.id === activeTab) && tabs.length > 0) {
       setActiveTab(tabs[0].id);
     }
   }, [tabs, activeTab]);
 
   useEffect(() => {
-    setCurrentWidgets(widgets.filter(w => w.tabId === activeTab));
+    setCurrentWidgets(widgets.filter((w) => w.tabId === activeTab));
   }, [widgets, activeTab]);
 
   return (
     <div className="dashboard-page">
       <Nav tabs className="dashboard-page--tab-header">
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <NavItem key={tab.id}>
             <NavLink
               className={classNames({ active: activeTab === tab.id })}
@@ -150,7 +130,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         )}
       </Nav>
       <TabContent activeTab={activeTab}>
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <TabPane tabId={tab.id} key={tab.id}>
             <Row>
               <Col sm="12">
@@ -164,8 +144,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                     isResizable={resizable}
                     isDraggable={resizable}
                   >
-                    {currentWidgets.map(widget =>
-                      constructWidget(widget, onEditWidget, onDeleteWidget),
+                    {currentWidgets.map((widget) =>
+                      constructWidget(
+                        widget,
+                        (widget) => dispatch(editWidget(widget)),
+                        (id) => dispatch(deleteWidget(id)),
+                      ),
                     )}
                   </GridLayout>
                 )}
@@ -176,11 +160,13 @@ const Dashboard: React.FC<DashboardProps> = ({
       </TabContent>
       <TabFormModal
         title="Add Tab"
-        onSubmit={values => {
-          onAddTab({
-            ...values,
-            id: uniqid(),
-          });
+        onSubmit={(values) => {
+          dispatch(
+            addTab({
+              ...values,
+              id: uniqid(),
+            }),
+          );
           setShowAddForm(false);
         }}
         open={showAddForm}
@@ -189,7 +175,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       {tabToDelete && (
         <ConfirmModal
           onYes={() => {
-            onDeleteTab(tabToDelete.id);
+            dispatch(deleteTab(tabToDelete.id));
             setTabToDelete(null);
           }}
           onClose={() => {
@@ -203,11 +189,13 @@ const Dashboard: React.FC<DashboardProps> = ({
       {tabToEdit && (
         <TabFormModal
           title={'Edit Tab'}
-          onSubmit={values => {
-            onEditTab({
-              id: tabToEdit.id,
-              ...values,
-            });
+          onSubmit={(values) => {
+            dispatch(
+              editTab({
+                id: tabToEdit.id,
+                ...values,
+              }),
+            );
             setTabToEdit(null);
           }}
           currentValue={tabToEdit}
@@ -218,8 +206,10 @@ const Dashboard: React.FC<DashboardProps> = ({
       <WidgetModal
         close={() => setWidgetModalVisible(false)}
         open={widgetModalVisibile}
-        onSubmit={type => {
-          addWidgetHelper(type, activeTab, onAddWidget);
+        onSubmit={(type) => {
+          addWidgetHelper(type, activeTab, (widget) =>
+            dispatch(addWidget(widget)),
+          );
           setWidgetModalVisible(false);
         }}
       />
@@ -227,17 +217,4 @@ const Dashboard: React.FC<DashboardProps> = ({
   );
 };
 
-export const DashboardPage = connect<StateProps, DispatchProps, {}, StoreState>(
-  state => ({
-    tabs: state.dashboard.tabs,
-    widgets: state.dashboard.widgets,
-  }),
-  {
-    onAddTab: addTab,
-    onDeleteTab: removeTab,
-    onEditTab: editTab,
-    onAddWidget: addWidget,
-    onEditWidget: editWidget,
-    onDeleteWidget: removeWidget,
-  },
-)(Dashboard);
+export default DashboardPage;

@@ -12,9 +12,6 @@ export const Header = () => (
             <div className="collapse navbar-collapse">
                 <ul className="ml-sm-auto navbar-nav">
                     <li className="nav-item">
-                        <Link className="nav-link active" to="/manage/page">Page</Link>
-                    </li>
-                    <li className="nav-item">
                         <Link className="nav-link" to="/">Logout</Link>
                     </li>
                 </ul>

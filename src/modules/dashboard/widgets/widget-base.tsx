@@ -59,7 +59,7 @@ const WidgetBase: React.FC<WidgetBaseProps> = ({
         {view === FORM_VIEW && (
           <div>
             <Formik
-              isInitialValid={false}
+              validateOnMount={true}
               initialValues={widget.props}
               onSubmit={values => {
                 const updatedWidget = {

@@ -50,7 +50,7 @@ class LoginPageBase extends React.Component<LoginPageBaseProps> {
         <div className="login-page--box">
           <h2>Login Page</h2>
           <Formik
-            isInitialValid={false}
+            validateOnMount={true}
             initialValues={{
               email: '',
               password: '',

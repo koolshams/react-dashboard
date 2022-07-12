@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { Formik, Form } from 'formik';
 import { TextField } from '../common/components/form-elements/text-field/text-field';
+import { useFormikContext } from 'formik';
 
 interface FormType  {
   name: string
@@ -30,10 +31,8 @@ export const TabFormModal = ({
       </ModalHeader>
       <ModalBody>
         <Formik
-          isInitialValid={false}
-          ref={node => {
-            formRef.current = node as any;
-          }}
+          innerRef={formRef}
+          validateOnMount={true}
           initialValues={{
             name: currentValue ? currentValue.name : '',
           }}
@@ -48,11 +47,12 @@ export const TabFormModal = ({
             const tab = {
               name: values.name,
             };
+            console.log('in onsbumit');
             onSubmit(tab);
           }}
         >
-          {({ errors, touched }) => (
-            <Form>
+          {({ errors, touched, handleSubmit }) => (
+            <Form onSubmit={handleSubmit} id="tabForm">
               <TextField
                 title="Name"
                 name="name"
@@ -69,9 +69,7 @@ export const TabFormModal = ({
         <Button
           color="primary"
           onClick={() => {
-            if (formRef.current) {
-              formRef.current.submitForm();
-            }
+            formRef.current.submitForm();
           }}
         >
           Save
